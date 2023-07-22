@@ -1,6 +1,17 @@
 # MultiTQ
 This is the code for the paper [Multi-granularity Temporal Question Answering over Knowledge Graphs](https://aclanthology.org/2023.acl-long.637) (Chen et al., ACL 2023).
 
+
+#### Question Examples
+|Example questions|	Answer|
+|  ----  | ----  |
+|Who condemned Abhisit Vejjajiva in May 2010?	|Thailand
+|Who was the first to visit the Middle East in 2008?	|Frank Bainimarama|
+|When did the Aam Aadmi Party first negotiated with Harish Rawat?|	2015-12-13|
+|Who expressed intent to engage in diplomatic cooperation with Ethiopia before Jun 25th, 2006?	|China|
+
+
+#### Architecture of MultiQA
 ![Architecture of MultiQA](https://img1.imgtp.com/2023/07/18/1rXQMVDG.png)
 
 ## Dataset and pretrained models
@@ -19,12 +30,12 @@ unzip Models.zip
 
 
 
-
-
 ## Running the code
 
 MultiQA on MultiTQ:
-```
+```bash
+cd MultiQA 
+python ner_task.py
 python ./train_qa_model.py --model multiqa
  ```
 
