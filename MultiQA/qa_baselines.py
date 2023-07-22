@@ -5,12 +5,10 @@ import numpy as np
 from tcomplex import TComplEx
 from transformers import RobertaModel
 from transformers import BertModel
-from transformers import DistilBertModel
 from transformers import AlbertModel
-
+from transformers import DistilBertModel
 from torch.nn import LayerNorm
-import random
-import pickle
+
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=1000):
@@ -35,30 +33,18 @@ class QA_baseline(nn.Module):
         self.tkbc_embedding_dim = tkbc_model.embeddings[0].weight.shape[1]
         self.sentence_embedding_dim = 768  # hardwired from roberta
 
-        # with open('./RobertaModel.pkl','rb') as f:
-        #     self.lm_model = pickle.load(f)
-
-        # self.pretrained_weights = 'roberta-base'
-        # self.lm_model = RobertaModel.from_pretrained(self.pretrained_weights)
-        # with open('./RobertaModel.pkl','wb') as f:
-        #     pickle.dump(self.lm_model,f)
-        # exit(0)
-        if args.lm == 'bert':
+        if args.lm_model == 'bert':
             self.pretrained_weights = 'bert-base-uncased'
-            self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
-        elif args.lm == 'roberta':
+            self.lm_model = BertModel.from_pretrained(self.pretrained_weights,mirror = 'tuna')
+        elif args.lm_model == 'roberta':
             self.pretrained_weights = 'roberta-base'
-            self.lm_model = RobertaModel.from_pretrained(self.pretrained_weights)
-        elif args.lm == 'albert':
-            print('Using Albert!')
+            self.lm_model = RobertaModel.from_pretrained(self.pretrained_weights,mirror = 'tuna')
+        elif args.lm_model == 'albert':
             self.pretrained_weights = 'albert-base-v2'
-            self.lm_model = AlbertModel.from_pretrained('./pretrained_LM/albert-base-v2')
+            self.lm_model = AlbertModel.from_pretrained(self.pretrained_weights,mirror = 'tuna')
         else:
             self.pretrained_weights = 'distilbert-base-uncased'
-            self.lm_model = DistilBertModel.from_pretrained('./pretrained_LM/distilbert-base-uncased')
-        # else:
-        #     self.pretrained_weights = 'distilbert-base-uncased'
-        #     self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
+            self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights,mirror = 'tuna')
 
         if args.lm_frozen == 1:
             print('Freezing LM params')
@@ -140,8 +126,6 @@ class QA_embedkgqa(QA_baseline):
         self.entity_embedding = tkbc_model.embeddings[0]
         self.time_embedding = tkbc_model.embeddings[2]
         self.rank = tkbc_model.rank
-        self.num_entities = tkbc_model.embeddings[0].weight.shape[0]
-        self.num_times = tkbc_model.embeddings[2].weight.shape[0]
         return
 
     def score(self, head_embedding, relation_embedding):
@@ -193,8 +177,8 @@ class QA_cronkgqa(QA_baseline):
             (lhs[1] * rel[0] * rhs[0] - lhs[0] * rel[1] * rhs[0] +
              lhs[0] * rel[0] * rhs[1] - lhs[1] * rel[1] * rhs[1])], dim=-1
         )
-        # scoring function from TComplEx
 
+    # scoring function from TComplEx
     def score_time(self, head_embedding, tail_embedding, relation_embedding):
         lhs = head_embedding
         rhs = tail_embedding
@@ -247,21 +231,17 @@ class QA_cronkgqa(QA_baseline):
         time_embedding = self.entity_time_embedding(times)
         question_embedding = self.getQuestionEmbedding(question_tokenized, question_attention_mask)
         relation_embedding = self.linear(question_embedding)
-
+        
         relation_embedding1 = self.dropout(self.bn1(self.linear1(relation_embedding)))
         relation_embedding2 = self.dropout(self.bn2(self.linear2(relation_embedding)))
         scores_time = self.score_time(head_embedding, tail_embedding, relation_embedding1)
-        # scores_time1 = self.score_time(head_embedding, tail_embedding, relation_embedding1)
-        # scores_time2 = torch.matmul(relation_embedding1, self.entity_time_embedding.weight.data[10488:, :].T) # cuz padding idx
-        # scores_time = torch.maximum(scores_time1, scores_time2)
         scores_entity = self.score_entity(head_embedding, tail_embedding, relation_embedding2, time_embedding)
 
         scores = torch.cat((scores_entity, scores_time), dim=1)
         return scores
 
 
-
-class QA_multiqa(QA_baseline):
+class QA_MultiQA(QA_baseline):
     def __init__(self, tkbc_model, args):
         super().__init__(tkbc_model, args)
         self.max_seq_length = 50  # randomly defining max length of tokens for question
@@ -269,8 +249,8 @@ class QA_multiqa(QA_baseline):
         self.month_position_embedding = nn.Embedding(self.max_seq_length, self.tkbc_embedding_dim)
         self.transformer_dim = self.tkbc_embedding_dim  # keeping same so no need to project embeddings
         self.pos = PositionalEncoding(self.transformer_dim)
-        self.nhead = 8
-        self.num_layers = 6
+        self.nhead = 4
+        self.num_layers = 2
         self.transformer_dropout = 0.1
         self.month_encoder_layer = nn.TransformerEncoderLayer(d_model=self.transformer_dim, nhead=self.nhead,
                                                               dropout=self.transformer_dropout)
@@ -368,47 +348,6 @@ class QA_multiqa(QA_baseline):
             mask[i, :length] = False  # fills good area with False
         return out_tensor, mask
 
-    def get_multi_transformered_time_embedding(self, x):
-        if len(x) == 1:
-            output = self.entity_time_embedding(x)
-        elif len(x) < 40:
-            time_embed = self.entity_time_embedding(x)
-
-            sequence_length = time_embed.shape[0]
-            v = np.arange(0, sequence_length, dtype=np.long)
-            indices_for_position_embedding = torch.from_numpy(v).cuda()
-            position_embedding = self.month_position_embedding(indices_for_position_embedding)
-            time_embed = time_embed + position_embedding
-            time_embed = self.layer_norm(time_embed)
-            # time_embed = torch.transpose(time_embed, 0, 1)
-            time_embed.unsqueeze_(1)
-            output = self.month_transformer_encoder(time_embed)
-            output.squeeze_(1)
-
-        else:
-            length = x.shape[0] // 12 * 12
-            x = x[:length].reshape(12, length // 12)
-            time_embed = self.entity_time_embedding(x)
-            sequence_length = time_embed.shape[1]
-            v = np.arange(0, sequence_length, dtype=np.long)
-            indices_for_position_embedding = torch.from_numpy(v).cuda()
-            position_embedding = self.month_position_embedding(indices_for_position_embedding)
-            position_embedding = position_embedding.unsqueeze(0).expand(time_embed.shape)
-            time_embed = time_embed + position_embedding
-            time_embed = time_embed.transpose(0, 1)
-            time_embed = self.layer_norm(time_embed)
-            output = self.month_transformer_encoder(time_embed)
-            year_time_embed = output.mean(dim=0)
-
-            sequence_length = year_time_embed.shape[0]
-            v = np.arange(0, sequence_length, dtype=np.long)
-            indices_for_position_embedding = torch.from_numpy(v).cuda()
-            position_embedding = self.year_position_embedding(indices_for_position_embedding)
-            year_time_embed = year_time_embed + position_embedding
-            year_time_embed.unsqueeze_(1)
-            year_time_embed = self.layer_norm(year_time_embed)
-            output = self.year_transformer_encoder(year_time_embed).squeeze(1)
-        return output.mean(dim=0)
 
     def _get_multi_transformered_time_embedding(self, x):
         if len(x) == 1:
@@ -439,7 +378,7 @@ class QA_multiqa(QA_baseline):
         heads = a[2].cuda()
         tails = a[3].cuda()
 
-        time_embedding = [self.get_multi_transformered_time_embedding(x.cuda()).unsqueeze(0) for x in a[4]]
+        time_embedding = [self._get_multi_transformered_time_embedding(x.cuda()).unsqueeze(0) for x in a[4]]
         time_embedding = torch.cat(time_embedding, dim=0)
 
         head_embedding = self.entity_time_embedding(heads)
@@ -450,10 +389,14 @@ class QA_multiqa(QA_baseline):
 
         relation_embedding1 = self.dropout(self.bn1(self.linear1(relation_embedding)))
         relation_embedding2 = self.dropout(self.bn2(self.linear2(relation_embedding)))
+        # scores_time = self.score_time(head_embedding, tail_embedding, relation_embedding1)
+        # scores_entity = self.score_entity(head_embedding, tail_embedding, relation_embedding2, time_embedding)
+        #
+        # scores = torch.cat((scores_entity, scores_time), dim=1)
         scores_time = self.score_time(head_embedding, tail_embedding, relation_embedding1)
-        scores_entity = self.score_entity(head_embedding, tail_embedding, relation_embedding2, time_embedding)
-
+        # scores_entity = self.score_entity(head_embedding, tail_embedding, relation_embedding2, time_embedding)
+        scores_entity1 = self.score_entity(head_embedding, tail_embedding, relation_embedding2, time_embedding)
+        scores_entity2 = self.score_entity(tail_embedding, head_embedding, relation_embedding2, time_embedding)
+        scores_entity = torch.maximum(scores_entity1, scores_entity2)
         scores = torch.cat((scores_entity, scores_time), dim=1)
         return scores
-
-

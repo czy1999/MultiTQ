@@ -1,12 +1,41 @@
 # MultiTQ
 This is the code for the paper [Multi-granularity Temporal Question Answering over Knowledge Graphs](https://aclanthology.org/2023.acl-long.637) (Chen et al., ACL 2023).
 
-
-
 ![Architecture of MultiQA](https://img1.imgtp.com/2023/07/18/1rXQMVDG.png)
 
-## Coming soon
-We are pleased to announce the release of the dataset, MultiTQ, which is currently being used for a competition. In order to prevent any leaks of the test set, it has not been made public at this time. However, the complete code and data will be released within this week. Thank you for your understanding :)
+## Dataset and pretrained models
+
+MultiTQ dataset can be found in ./data folder.
+
+```bash
+git clone https://github.com/czy1999/MultiTQ.git
+
+cd ./MultiTQ/data
+unzip Dataset.zip
+
+cd ../MultiQA/models
+unzip Models.zip
+```
+
+
+
+
+
+## Running the code
+
+MultiQA on MultiTQ:
+```
+python ./train_qa_model.py --model multiqa
+ ```
+
+
+Please explore more argument options in train_qa_model.py.
+
+
+
+
+The implementation is based on TempoQR in [TempoQR: Temporal Question Reasoning over Knowledge Graphs](https://arxiv.org/abs/2112.05785) and their code from https://github.com/cmavro/TempoQR. You can find more installation details there.
+We use TComplEx KG Embeddings as implemented in https://github.com/facebookresearch/tkbc.
 
 ## Cite
 

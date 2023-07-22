@@ -35,8 +35,8 @@ class TKBCModel(nn.Module, ABC):
         Returns filtered ranking for each queries.
         :param queries: a torch.LongTensor of quadruples (lhs, rel, rhs, timestamp)
         :param filters: filters[(lhs, rel, ts)] gives the elements to filter from ranking
-        :param batch_size: maximum number of queries processed at once
-        :param chunk_size: maximum number of candidates processed at once
+        :param batch_size: maximum number of queries tkbc_processed_data at once
+        :param chunk_size: maximum number of candidates tkbc_processed_data at once
         :return:
         """
         if chunk_size < 0:
@@ -86,7 +86,7 @@ class TKBCModel(nn.Module, ABC):
         """
         Returns filtered ranking for each queries.
         :param queries: a torch.LongTensor of quadruples (lhs, rel, rhs, begin, end)
-        :param batch_size: maximum number of queries processed at once
+        :param batch_size: maximum number of queries tkbc_processed_data at once
         :return:
         """
         all_scores, all_truth = [], []
@@ -113,7 +113,7 @@ class TKBCModel(nn.Module, ABC):
         Returns filtered ranking for a batch of queries ordered by timestamp.
         :param queries: a torch.LongTensor of quadruples (lhs, rel, rhs, timestamp)
         :param filters: ordered filters
-        :param chunk_size: maximum number of candidates processed at once
+        :param chunk_size: maximum number of candidates tkbc_processed_data at once
         :return:
         """
         if chunk_size < 0:
