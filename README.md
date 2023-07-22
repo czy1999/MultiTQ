@@ -1,8 +1,8 @@
 # MultiTQ
 This is the code for the paper [Multi-granularity Temporal Question Answering over Knowledge Graphs](https://aclanthology.org/2023.acl-long.637) (Chen et al., ACL 2023).
 
+MULTITQ is a large-scale dataset featuring ample relevant facts and multiple temporal granularities.
 
-#### Question Examples
 |Example questions|	Answer|
 |  ----  | ----  |
 |Who condemned Abhisit Vejjajiva in May 2010?	|Thailand
@@ -32,7 +32,8 @@ unzip Models.zip
 
 ## Running the code
 
-MultiQA on MultiTQ:
+MultiQA, a strong baseline to
+handle multi-granularity TKGQA
 ```bash
 cd MultiQA 
 python ner_task.py
