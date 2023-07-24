@@ -55,7 +55,7 @@ If you find our method, code, or experimental setups useful, please cite our pap
 
 
 
-```
+```bibtex
 @inproceedings{chen-etal-2023-multi,
     title = "Multi-granularity Temporal Question Answering over Knowledge Graphs",
     author = "Chen, Ziyang  and
