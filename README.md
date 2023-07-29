@@ -3,6 +3,8 @@ This is the code for the paper [Multi-granularity Temporal Question Answering ov
 
 MULTITQ is a large-scale dataset featuring ample relevant facts and multiple temporal granularities.
 
+Datasets Link: https://huggingface.co/datasets/chenziyang/MultiTQ
+
 |Example questions|	Answer|
 |  ----  | ----  |
 |Who condemned Abhisit Vejjajiva in May 2010?	|Thailand
@@ -16,7 +18,7 @@ MULTITQ is a large-scale dataset featuring ample relevant facts and multiple tem
 
 ## Dataset and pretrained models
 
-MultiTQ dataset can be found in ./data folder.
+MultiTQ dataset can be found in ./data folder. 
 
 ```bash
 git clone https://github.com/czy1999/MultiTQ.git
