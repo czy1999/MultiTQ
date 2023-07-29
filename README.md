@@ -73,6 +73,3 @@ If you find our method, code, or experimental setups useful, please cite our pap
 }
 ```
 
-```
-[1] Ziyang Chen, Jinzhi Liao, and Xiang Zhao. 2023. Multi-granularity Temporal Question Answering over Knowledge Graphs. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 11378–11392, Toronto, Canada. Association for Computational Linguistics.
-```
