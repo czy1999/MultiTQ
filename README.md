@@ -1,9 +1,9 @@
-# MultiTQ
+# 🎉MultiTQ
 This is the code for the paper [Multi-granularity Temporal Question Answering over Knowledge Graphs](https://aclanthology.org/2023.acl-long.637) (Chen et al., ACL 2023).
 
 MULTITQ is a large-scale dataset featuring ample relevant facts and multiple temporal granularities.
 
-Datasets Link: https://huggingface.co/datasets/chenziyang/MultiTQ
+🤗Datasets Link: https://huggingface.co/datasets/chenziyang/MultiTQ
 
 |Example questions|	Answer|
 |  ----  | ----  |
