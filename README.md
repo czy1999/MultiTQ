@@ -20,7 +20,7 @@ MULTITQ is a large-scale dataset featuring ample relevant facts and multiple tem
 
 
 #### Architecture of MultiQA
-![Architecture of MultiQA](https://img1.imgtp.com/2023/07/18/1rXQMVDG.png)
+![Architecture of MultiQA](https://s11.ax1x.com/2024/01/08/pFSxUpT.png)
 
 ## Dataset and pretrained models
 
