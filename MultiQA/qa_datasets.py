@@ -1,5 +1,4 @@
 from pathlib import Path
-import pkg_resources
 import pickle
 from collections import defaultdict
 from typing import Dict, Tuple, List
@@ -37,7 +36,7 @@ class QA_Dataset_cron(Dataset):
 
         #probably change for bert/roberta?
         self.tokenizer_class = DistilBertTokenizer
-        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased',mirror = 'tuna')
+        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
         if args.lm_model == 'albert':
             self.pretrained_weights = 'albert-base-v2'
             self.tokenizer = AlbertTokenizer.from_pretrained(self.pretrained_weights)
@@ -406,7 +405,7 @@ class QA_Dataset_multi(Dataset):
 
 
         self.tokenizer_class = DistilBertTokenizer
-        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased',mirror = 'tuna')
+        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
         if args.lm_model == 'albert':
             self.pretrained_weights = 'albert-base-v2'
             self.tokenizer = AlbertTokenizer.from_pretrained(self.pretrained_weights)

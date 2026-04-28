@@ -35,16 +35,16 @@ class QA_baseline(nn.Module):
 
         if args.lm_model == 'bert':
             self.pretrained_weights = 'bert-base-uncased'
-            self.lm_model = BertModel.from_pretrained(self.pretrained_weights,mirror = 'tuna')
+            self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
         elif args.lm_model == 'roberta':
             self.pretrained_weights = 'roberta-base'
-            self.lm_model = RobertaModel.from_pretrained(self.pretrained_weights,mirror = 'tuna')
+            self.lm_model = RobertaModel.from_pretrained(self.pretrained_weights)
         elif args.lm_model == 'albert':
             self.pretrained_weights = 'albert-base-v2'
-            self.lm_model = AlbertModel.from_pretrained(self.pretrained_weights,mirror = 'tuna')
+            self.lm_model = AlbertModel.from_pretrained(self.pretrained_weights)
         else:
             self.pretrained_weights = 'distilbert-base-uncased'
-            self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights,mirror = 'tuna')
+            self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
 
         if args.lm_frozen == 1:
             print('Freezing LM params')

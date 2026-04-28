@@ -1,5 +1,6 @@
 import difflib
 import json
+import os
 from flair.data import Sentence
 from flair.models import SequenceTagger
 from tqdm import tqdm
@@ -34,6 +35,7 @@ if __name__ == '__main__':
     kg_path = '../data/MultiTQ/kg/tkbc_processed_data/ent_id'
     input_path = '../data/MultiTQ/questions/'
     output_path = '../data/MultiTQ/questions/processed_questions/'
+    os.makedirs(output_path, exist_ok=True)
     with open(kg_path,'r',encoding='utf-8') as f:
         data = f.readlines()
     all_entities = []
@@ -54,7 +56,7 @@ if __name__ == '__main__':
             for entity in s.get_spans('ner'):
                 entity_text = difflib.get_close_matches(entity.text,keys,n=1)
                 e.append({'entity':entity_text,'position':[entity.start_position,entity.end_position]})
-                clean_ner_result = [y for y in e if len(y['entity'])>0]
+            clean_ner_result = [y for y in e if len(y['entity'])>0]
             dataset[ix]['time'] = extract_time(dataset[ix]['question'])
             dataset[ix]['entities'] = [x['entity'][0] for x in clean_ner_result]
             dataset[ix]['entity_positions'] = clean_ner_result
