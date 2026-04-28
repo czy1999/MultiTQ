@@ -36,18 +36,59 @@ cd ../MultiQA/models
 unzip Models.zip
 ```
 
+## Environment setup
 
+The pinned versions in `MultiQA/requirements.txt` are from 2021 and no
+longer install on modern GPUs (RTX 30xx/40xx need CUDA >= 11.8 and
+PyTorch >= 2.0). A modernised dependency list and a one-shot setup
+script are provided at the repository root.
+
+### Option 1 — one-shot script (recommended)
+
+```bash
+bash setup_env.sh
+```
+
+This creates a conda environment named `multitq` (Python 3.10),
+installs PyTorch 2.1.2 (CUDA 12.1 wheel), and installs the rest of the
+dependencies from `requirements.txt`. End-to-end verified on RTX 4090.
+
+If you are in mainland China and the default endpoints are too slow,
+open `setup_env.sh` and uncomment the blocks marked `[CN MIRRORS]`
+(Tsinghua PyPI + Aliyun PyTorch wheels). For HuggingFace model
+downloads (DistilBERT, `flair/ner-english-large`, ...) you can also
+set:
+
+```bash
+export HF_ENDPOINT=https://hf-mirror.com
+```
+
+### Option 2 — manual install
+
+```bash
+conda create -n multitq python=3.10 -y
+conda activate multitq
+pip install -r requirements.txt
+```
 
 ## Running the code
 
-MultiQA, a strong baseline to
-handle multi-granularity TKGQA
-```bash
-cd MultiQA 
-python ner_task.py
-python ./train_qa_model.py --model multiqa
- ```
+MultiQA, a strong baseline to handle multi-granularity TKGQA. It runs
+in two stages: an NER preprocessing pass that adds entity/time
+annotations to each question (output written to
+`data/MultiTQ/questions/processed_questions/`), and the actual QA
+training.
 
+```bash
+cd MultiQA
+python ner_task.py                          # NER preprocessing (uses GPU if available)
+python ./train_qa_model.py --model multiqa  # Train MultiQA
+```
+
+The first run of `ner_task.py` downloads the
+[`flair/ner-english-large`](https://huggingface.co/flair/ner-english-large)
+checkpoint (~1.4 GB). On an RTX 4090 + 22-core CPU, the full
+preprocessing of train/dev/test (~500k questions) takes about an hour.
 
 Please explore more argument options in train_qa_model.py.
 
